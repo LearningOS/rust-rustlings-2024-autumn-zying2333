@@ -2,11 +2,11 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
-use std::vec::*;
+
 
 #[derive(Debug)]
 struct Node<T> {
@@ -29,13 +29,13 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: Clone + PartialOrd> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: Clone + PartialOrd> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -69,38 +69,54 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+	pub fn merge(mut list_a:LinkedList<T>,mut list_b:LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+		let mut merged_list = LinkedList::<T>::new();
+        let mut i = 0;
+        let mut j = 0;
+
+        while i < list_a.length as i32 && j < list_b.length as i32 {
+            if list_a.get(i).unwrap() < list_b.get(j).unwrap() {
+                merged_list.add(list_a.get(i).unwrap().clone());
+                i += 1;
+            } else {
+                merged_list.add(list_b.get(j).unwrap().clone());
+                j += 1;
+            }
         }
-	}
+	
+
+
+while i < list_a.length as i32 {
+    merged_list.add(list_a.get(i).unwrap().clone());
+    i += 1;
 }
+
+while j < list_b.length as i32 {
+    merged_list.add(list_b.get(j).unwrap().clone());
+    j += 1;
+}
+
+merged_list
+    }
+}
+        
+    
+
 
 impl<T> Display for LinkedList<T>
 where
     T: Display,
 {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        match self.start {
-            Some(node) => write!(f, "{}", unsafe { node.as_ref() }),
-            None => Ok(()),
+        let mut node = self.start;
+        while let Some(current) = node {
+            unsafe {
+                write!(f, "{} -> ", (*current.as_ptr()).val)?;
+                node = (*current.as_ptr()).next;
+            }
         }
-    }
-}
-
-impl<T> Display for Node<T>
-where
-    T: Display,
-{
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        match self.next {
-            Some(node) => write!(f, "{}, {}", self.val, unsafe { node.as_ref() }),
-            None => write!(f, "{}", self.val),
-        }
+        write!(f, "None")
     }
 }
 
